@@ -72,19 +72,28 @@ class PlayerControllerMinimax(PlayerController):
             
             
         
-    def minmax(self, current_node, depth, a, b):
+    def minmax(self, current_node, depth, a, b, maximizing_player=True):
         current_node.compute_and_get_children()
         if depth == 0:
             return self.heuristic_function(current_node=current_node) #static value of this posistion
-        maxEval = -9999
-        for node in current_node.children:
-            _eval = self.minmax(current_node=node, depth=depth-1, a=a, b=b)
-            maxEval = max(maxEval, _eval)
-            b = min(b, _eval)
-            a = max(a, _eval)
-            if b <= a:
-                break
-        return maxEval
+        if maximizing_player:
+            maxEval = -9999
+            for node in current_node.children:
+                _eval = self.minmax(current_node=node, depth=depth-1, a=a, b=b, maximizing_player=False)
+                maxEval = max(maxEval, _eval)
+                a = max(a, _eval)
+                if b <= a:
+                    break
+            return maxEval
+        else:
+            minEval = 9999
+            for node in current_node.children:
+                _eval = self.minmax(current_node=node, depth=depth-1, a=a, b=b, maximizing_player=True)
+                minEval = min(minEval, _eval)
+                b = min(b, _eval)
+                if b <= a:
+                    break
+            return minEval
         
     def search_best_next_move(self, initial_tree_node):
         """
@@ -100,11 +109,12 @@ class PlayerControllerMinimax(PlayerController):
 
         # NOTE: Don't forget to initialize the children of the current node
         #       with its compute_and_get_children() method!
-        initial_tree_node.children = initial_tree_node.compute_and_get_children()
+        initial_tree_node.compute_and_get_children()
+        initial_tree_node.children.sort(key=lambda node: self.heuristic_function(node), reverse=True)
         maxVal = -9999
         nextNode = initial_tree_node.children[0]
         for node in initial_tree_node.children:
-            val = self.minmax(current_node=node, depth=7, a=-9999, b=9999)
+            val = self.minmax(current_node=node, depth=3, a=-9999, b=9999, maximizing_player=True)
             if(maxVal < val):
                 maxVal = val
                 nextNode = node
