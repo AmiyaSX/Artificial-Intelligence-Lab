@@ -144,7 +144,7 @@ class PlayerControllerMinimax(PlayerController):
         initial_tree_node.compute_and_get_children()
         max_val = -math.inf
         best_move = 0
-        depth = 0
+        depth = 1
         visited_nodes = dict()
         
         while True:
@@ -161,5 +161,4 @@ class PlayerControllerMinimax(PlayerController):
             except:
                 break
 
-        
         return ACTION_TO_STR[best_move]
